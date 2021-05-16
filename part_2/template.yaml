@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  getting-started-with-serverless-python
+
+  Sample SAM Template for getting-started-with-serverless-python
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+# Parameters
+Parameters:
+  slackUrl:
+    Type: String
+    Description: your Slack Webhook Url.
+    Default: ""
+
+
+Resources:
+  WebHookHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          slackEndpoint: !Ref slackUrl
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: POST
+
+
+Outputs:
+  GitHubEndpoint:
+    Description: "The star invocation URl to provide to github webhook"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
